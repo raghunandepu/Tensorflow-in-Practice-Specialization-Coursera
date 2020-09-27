@@ -32,9 +32,24 @@ model.compile(optimizer="Adam",
               loss="sparse_categorical_crossentropy",
               metrics=['accuracy'])
 
-model.fit(X_train, y_train, epochs=10)
+
+class myCallback(tf.keras.callbacks.Callback):
+    def on_epoch_end(self, epoch, logs=None):
+        if(logs.get('accuracy') > 0.95):
+            print("\nReached required accuracy so cancelling training!")
+            self.model.stop_training  = True
+
+callbacks = myCallback()
+
+model.fit(X_train, y_train, epochs=100, callbacks=[callbacks])
 
 # Returns loss value and metric
 print(model.evaluate(X_test, y_test))
 
 # Observation: This model return 87.84% accuracy.
+
+# Testing
+classifications = model.predict(X_test)
+print(classifications[0])
+print(y_test[0])
+
